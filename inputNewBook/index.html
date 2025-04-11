@@ -8,46 +8,31 @@
 </head>
 <body>
     <h1>Enter Details</h1>
-    <form id="myForm">
-        <label for="idBook">ID Book:</label><br>
-        <input type="text" id="idBook" name="idBook" required><br>
-        <label for="bookTitle">Book Title:</label><br>
-        <input type="text" id="bookTitle" name="bookTitle" required><br>
-        <label for="writter">Writter:</label><br>
-        <input type="text" id="writter" name="writter" required><br>
-        <label for="year">Year:</label><br>
-        <input type="text" id="year" name="year" required><br>
-        <label for="quantity">Quantity:</label><br>
-        <input type="text" id="quantity" name="quantity" required><br>
+    <form name="submit-to-google-sheet">
+        <input type="text" id="idBook" name="ID Book" placeholder="ID Book" required>
+        <input type="text" id="bookTitle" name="Book Title" placeholder="Book Title" required>
+        <input type="text" id="writter" name="Writter" placeholder="Writter" required>
+        <input type="text" id="year" name="Year of Publish" placeholder="Year of Publish" required>
+        <input type="text" id="quantity" name="Quantity" placeholder="Quantity" required><br>
         <button type="submit">Submit</button>
     </form>
 
     <div id="status"></div>
 
     <script>
-        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your script URL
-        const form = document.forms['myForm'];
-        const statusDiv = document.getElementById('status');
-
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwUtyrSNvuTivtZ86LJcJj7mwa1NVCe2qCUfGfuZUGleK_miJgYBOAH8Hk7SbRIgDM/exec'
+        const form = document.forms['submit-to-google-sheet']
+      
         form.addEventListener('submit', e => {
-            e.preventDefault();
-            statusDiv.textContent = 'Loading...';
-            const formData = new FormData(form);
-            fetch(scriptURL, { method: 'POST', body: formData })
-                .then(response => {
-                    if (response.ok) {
-                        statusDiv.textContent = 'Success! Data submitted.';
-                        form.reset();
-                    } else {
-                        statusDiv.textContent = 'Error! Something went wrong.';
-                        console.error('Error:', response.status, response.statusText);
-                    }
-                })
-                .catch(error => {
-                    statusDiv.textContent = 'Error! ' + error.message;
-                    console.error('Error:', error);
-                });
-        });
-    </script>
+          e.preventDefault()
+          fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+            .then(response => {console.log('Success!', response);
+            alert("Data berhasil dikirim!");
+            form.reset()})
+            .catch(error => {console.error('Error!', error.message);
+            alert("Terjadi kesalahan saat mengirim. Coba lagi nanti.");
+            })
+        })
+      </script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input New Book</title>
+  <link href='/style.css' rel='stylesheet'>
+</head>
+<body>
+    <h1>Enter Details</h1>
+    <form id="myForm">
+        <label for="idBook">ID Book:</label><br>
+        <input type="text" id="idBook" name="idBook" required><br>
+        <label for="bookTitle">Book Title:</label><br>
+        <input type="text" id="bookTitle" name="bookTitle" required><br>
+        <label for="writter">Writter:</label><br>
+        <input type="text" id="writter" name="writter" required><br>
+        <label for="year">Year:</label><br>
+        <input type="text" id="year" name="year" required><br>
+        <label for="quantity">Quantity:</label><br>
+        <input type="text" id="quantity" name="quantity" required><br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="status"></div>
+
+    <script>
+        const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your script URL
+        const form = document.forms['myForm'];
+        const statusDiv = document.getElementById('status');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            statusDiv.textContent = 'Loading...';
+            const formData = new FormData(form);
+            fetch(scriptURL, { method: 'POST', body: formData })
+                .then(response => {
+                    if (response.ok) {
+                        statusDiv.textContent = 'Success! Data submitted.';
+                        form.reset();
+                    } else {
+                        statusDiv.textContent = 'Error! Something went wrong.';
+                        console.error('Error:', response.status, response.statusText);
+                    }
+                })
+                .catch(error => {
+                    statusDiv.textContent = 'Error! ' + error.message;
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>

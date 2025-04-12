@@ -4,29 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Elix Library Data</title>
-  <p>lihat ketersediaan buku</p>
   <link href='/style.css' rel='stylesheet'>
 </head>
 <body>
   <h1>Elix Library Data</h1>
-  <input type="text" placeholder="Search by title" required>
-  <button onclick="console.log('searching');">Search</button>
+  <p>Lihat ketersediaan buku</p>
 
-<table border="1px solid black">
-  <tr>
-    <th>ID Book</th>
-    <th>Title</th>
-    <th>Writter</th>
-    <th>Year of Published</th>
-    <th>Quantity</th>
-  </tr>
-  <tr>
-    <td>
-      <!-- automate from js function -->
-    </td>
-  </tr>
-</table>
+  <input type="text" id="searchInput" placeholder="Search by title" required>
+  <button id="searchButton">Search</button>
 
-  <script defer type="text/javascript" src="/main.js"></script>
+  <table border="1px solid black">
+    <thead>
+      <tr>
+        <th>ID Book</th>
+        <th>Title</th>
+        <th>Writter</th>
+        <th>Year of Published</th>
+        <th>Quantity</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- otomatis diisi oleh JavaScript -->
+    </tbody>
+  </table>
+
+  <button id="backToTop">Back to Top</button>
+
+  <script>
+    // Saat dokumen siap, ambil data dari Google Sheet
+    document.addEventListener("DOMContentLoaded", function () {
+      const sheetURL = "https://docs.google.com/spreadsheets/d/10ZCSRTx28XfooFFQGueu6B0_qe18sSlt2MRGHjuL7GM/edit?usp=sharing";
+      fetchData(sheetURL);
+    });
+
+    // Mengambil data CSV dari Google Sheets
+    function fetchData(sheetURL) {
+      fetch(sheetURL)
+        .then(response => response.text())
+        .then(data => populateTable(data))
+        .catch(error => console.error("Gagal mengambil data:", error));
+    }
+
+    // Mengisi tabel dengan data yang diambil
+    function populateTable(data) {
+      const tableBody = document.getElementById("tableBody");
+      tableBody.innerHTML = "";
+
+      const rows = data.split("\n").slice(1); // Lewati header
+      rows.forEach(row => {
+        const columns = row.split(",");
+        const newRow = document.createElement("tr");
+
+        columns.forEach(column => {
+          const cell = document.createElement("td");
+          cell.textContent = column.trim();
+          newRow.appendChild(cell);
+        });
+
+        tableBody.appendChild(newRow);
+      });
+    }
+
+    // function searchTable() {
+    //   const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
+    //   const tableBody = document.getElementById("tbody");
+    //   const rows = Array.from(tableBody.querySelectorAll("tr"));
+
+    //   let found = false;
+
+    //   rows.forEach(row => {
+    //     let cells = row.getElementsByTagName("td");
+    //     let match = false;
+
+    //     for (let cell of cells) {
+    //       let words = cell.textContent.split(" ");
+    //       let newText = words.map(word => {
+    //         if (word.toLowerCase() === searchValue) {
+    //           match = true;
+    //           return `<span class="highlight">${word}</span>`;
+    //         }
+    //         return word;
+    //       }).join(" ");
+    //       cell.innerHTML = newText;
+    //     }
+
+    //     if (match && !found) {
+    //       row.scrollIntoView({ behavior: "smooth", block: "center" });
+    //       found = true;
+    //     }
+    //   });
+
+    //   if (!found) {
+    //     alert(`Kata "${searchValue}" tidak ditemukan dalam daftar.`);
+    //   }
+    // }
+
+    // document.getElementById("searchButton").addEventListener("click", searchTable);
+    // document.getElementById("backToTop").addEventListener("click", () => {
+    //   window.scrollTo({ top: 0, behavior: 'smooth' });
+    // });
+  </script>
 </body>
 </html>

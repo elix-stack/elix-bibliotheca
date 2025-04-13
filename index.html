@@ -3,31 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styleAdmin.css">
   <title>Elix Library Data</title>
-  <link href='/style.css' rel='stylesheet'>
 </head>
 <body>
   <h1>Elix Library Data</h1>
   <button><a href="./inputNewBook/index.html">Input New Book</a></button>
   <button><a href="./userInterface/index.html">UI</a></button>
-  <input type="text" placeholder="Search by title" required>
-  <button onclick="console.log('searching');">Search</button>
+  <button><a href="">Pinjam/Kembali</a></button>
+  <input id="searchInput" type="text" placeholder="Search by title" required>
+  <button id="searchButton" onclick="console.log('searching');">Search</button>
 
 <table border="1px solid black">
-  <tr>
+  <thead>
+    <tr>
+    <th>Timestamp</th>
     <th>ID Book</th>
     <th>Title</th>
     <th>Writter</th>
     <th>Year of Published</th>
     <th>Quantity</th>
-  </tr>
-  <tr>
-    <td>
-      <!-- automate from js function -->
-    </td>
-  </tr>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    <tr>
+      <td>
+        <!-- automate from js function -->
+      </td>
+    </tr>
+  </tbody>
 </table>
-
-  <script defer type="text/javascript" src="/main.js"></script>
+<button id="backToTop">Back to Top</button>
+<script src="script.js"></script>
 </body>
 </html>

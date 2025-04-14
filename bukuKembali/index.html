@@ -1,9 +1,67 @@
-// Variabel global untuk menyimpan isi asli setiap sel tabel
-let originalTableData = [];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Buku Kembali</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Data Buku Kembali</h1>
+    <form name="submit-to-google-sheet">
+        <input type="text" id="idMember" name="ID Member" placeholder="ID Member" required>
+        <input type="text" id="namaPeminjam" name="Nama Peminjam" placeholder="Nama Peminjam" required>
+        <input type="email" id="emailPeminjam" name="Email Peminjam" placeholder="Email Peminjam" required>
+        <input type="text" id="telpPeminjam" name="Telp Peminjam" placeholder="Telp Peminjam" required>
+        <input type="text" id="idBook" name="ID Book" placeholder="ID Book" required>
+        <input type="text" id="bookTitle" name="Book Title" placeholder="Book Title" required>
+        <input type="text" id="quantity" name="Quantity" placeholder="Quantity" required><br>
+        <button type="submit">Kembali</button>
+    </form>
+    <br>
 
-// Saat dokumen siap dimuat, ambil data dari Google Sheets
+    <input id="searchInput" type="text" placeholder="Search by title" required>
+    <button id="searchButton" onclick="console.log('searching');">Search</button>
+    <br><br>
+
+    <table border="1px solid black">
+        <thead>
+          <tr>
+          <th>Timestamp</th>
+          <th>ID Member</th>
+          <th>Nama Peminjam</th>
+          <th>Email Peminjam</th>
+          <th>Telp Peminjam</th>
+          <th>ID Book</th>
+          <th>Book Title</th>
+          <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td>
+              <!-- automate from js function -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+          <button id="backToTop">Back to Top</button>
+    <script>
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzoa8F7RBRTW1NZVBmHBh2hVHr_1HtYYUB570en2MTJ5JFJGJv98-y53eTVhCX0df-Dfg/exec'
+  const form = document.forms['submit-to-google-sheet']
+
+  form.addEventListener('submit', e => {
+    e.preventDefault()
+    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+      .then(response => {console.log('Success!', response);
+        form.reset()})
+      .catch(error => console.error('Error!', error.message))
+  })
+
+  // Saat dokumen siap dimuat, ambil data dari Google Sheets
 document.addEventListener("DOMContentLoaded", function () {
-  const sheetURL = "https://script.google.com/macros/s/AKfycbzNLsrXkouOGhmrQ59hDRoKAzSBZw1hwOewxUOfIrnIY_DGrtZx2pK3MqPaCBQOhsf2YQ/exec";
+  const sheetURL = "https://script.google.com/macros/s/AKfycbwIKXpEPelVenftPi8pxTeDBwNU7RyPBS15r9jkchJipX9zZnP0OvA2fclpTHT_SZ0A8A/exec";
   fetchData(sheetURL);
 });
 
@@ -25,12 +83,13 @@ function populateTable(data) {
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
       <td>${row["timestamp"] || "-"}</td>
+      <td>${row["ID Member"] || "-"}</td>
+      <td>${row["Nama Peminjam"] || "-"}</td>
+      <td>${row["Email Peminjam"] || "-"}</td>
+      <td>${row["Telp Peminjam"] || "-"}</td>
       <td>${row["ID Book"] || "-"}</td>
       <td>${row["Book Title"] || "-"}</td>
-      <td>${row["Writter"] || "-"}</td>
-      <td>${row["Year of Publish"] || "-"}</td>
       <td>${row["Quantity"] || "-"}</td>
-      <td>${row["Status"] || "-"}</td>
     `;
     tableBody.appendChild(newRow);
 
@@ -98,3 +157,6 @@ document.getElementById("searchInput").addEventListener("keypress", function (e)
 document.getElementById("backToTop").addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
+    </script>
+</body>
+</html>

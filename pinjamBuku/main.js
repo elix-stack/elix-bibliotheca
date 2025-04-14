@@ -1,15 +1,36 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxcrqpLzKcaFkwnH2AaZCDxhFXpK_vAvG2dtavsTmIqECPcfuUdZ655eSGZCUdOT4S3Lw/exec'
-  const form = document.forms['submit-to-google-sheet']
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxcrqpLzKcaFkwnH2AaZCDxhFXpK_vAvG2dtavsTmIqECPcfuUdZ655eSGZCUdOT4S3Lw/exec';
+const form = document.forms['submit-to-google-sheet'];
 
-  form.addEventListener('submit', e => {
-    e.preventDefault()
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-      .then(response => {console.log('Success!', response);
-        form.reset()})
-      .catch(error => console.error('Error!', error.message))
-  })
+form.addEventListener('submit', e => {
+  e.preventDefault();
 
-  // Saat dokumen siap dimuat, ambil data dari Google Sheets
+  // Tampilkan loader
+  document.getElementById("loading").style.display = "block";
+
+  // Validasi quantity
+  const quantity = form.querySelector('#quantity').value;
+  if (isNaN(quantity) || Number(quantity) <= 0) {
+    alert("Quantity harus berupa angka dan lebih dari 0.");
+    document.getElementById("loading").style.display = "none";
+    return;
+  }
+
+  const formData = new FormData(form);
+
+  // Kirim data ke Apps Script
+  fetch(scriptURL, { method: 'POST', body: formData })
+    .then(response => {
+      console.log('Success!', response);
+      form.reset();
+      document.getElementById("loading").style.display = "none";
+    })
+    .catch(error => {
+      console.error('Error!', error.message);
+      document.getElementById("loading").style.display = "none";
+    });
+});
+
+// Saat dokumen siap dimuat, ambil data dari Google Sheets
 document.addEventListener("DOMContentLoaded", function () {
   const sheetURL = "https://script.google.com/macros/s/AKfycbzvWe9gvgrzitNKktt1Kl7NrgiY-0eUaNXKHXW1gfejvath6S33QX-DEHoTblTw8gVUIg/exec";
   fetchData(sheetURL);
@@ -24,6 +45,7 @@ function fetchData(sheetURL) {
 }
 
 // Fungsi untuk mengisi tabel dengan data yang diambil dan menyimpan versi asli-nya
+let originalTableData = []; // Pastikan ini dideklarasikan global
 function populateTable(data) {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = ""; // Kosongkan isi sebelumnya
@@ -57,37 +79,30 @@ function searchTable() {
 
   let found = false;
 
-  // Loop melalui setiap baris tabel
   rows.forEach((row, rowIndex) => {
     let match = false;
 
-    // Loop melalui setiap sel dalam baris
     Array.from(row.cells).forEach((cell, cellIndex) => {
-      // Ambil isi asli cell (tanpa highlight)
       const originalText = originalTableData[rowIndex][cellIndex];
       const lowerText = originalText.toLowerCase();
 
       if (lowerText.includes(searchValue)) {
         match = true;
-        // Ganti bagian teks yang cocok dengan elemen highlight
         cell.innerHTML = originalText.replace(
           new RegExp(`(${searchValue})`, "gi"),
           `<span class="highlight">$1</span>`
         );
       } else {
-        // Jika tidak cocok, kembalikan ke isi asli (tanpa highlight)
         cell.innerHTML = originalText;
       }
     });
 
-    // Jika baris cocok dan belum ada hasil sebelumnya, scroll ke sana
     if (match && !found) {
       row.scrollIntoView({ behavior: "smooth", block: "center" });
       found = true;
     }
   });
 
-  // Jika tidak ditemukan sama sekali, tampilkan alert
   if (!found) {
     alert(`Kata "${searchValue}" tidak ditemukan dalam daftar.`);
   }
@@ -99,6 +114,7 @@ document.getElementById("searchButton").addEventListener("click", searchTable);
 // Tombol pencarian (tekan Enter)
 document.getElementById("searchInput").addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
+    e.preventDefault();
     searchTable();
   }
 });

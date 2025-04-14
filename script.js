@@ -1,100 +1,102 @@
-// Variabel global untuk menyimpan isi asli setiap sel tabel
+// Endpoint GAS
+const formSubmitURL = 'https://script.google.com/macros/s/AKfycbwUtyrSNvuTivtZ86LJcJj7mwa1NVCe2qCUfGfuZUGleK_miJgYBOAH8Hk7SbRIgDM/exec';
+const dataDisplayURL = 'https://script.google.com/macros/s/AKfycbzNLsrXkouOGhmrQ59hDRoKAzSBZw1hwOewxUOfIrnIY_DGrtZx2pK3MqPaCBQOhsf2YQ/exec';
+
 let originalTableData = [];
 
-// Saat dokumen siap dimuat, ambil data dari Google Sheets
-document.addEventListener("DOMContentLoaded", function () {
-  const sheetURL = "https://script.google.com/macros/s/AKfycbzNLsrXkouOGhmrQ59hDRoKAzSBZw1hwOewxUOfIrnIY_DGrtZx2pK3MqPaCBQOhsf2YQ/exec";
-  fetchData(sheetURL);
+document.addEventListener("DOMContentLoaded", () => {
+  fetchData(dataDisplayURL);
+  initFormSubmit();
+  initSearch();
+  initBackToTop();
 });
 
-// Fungsi untuk mengambil data dari Google Sheets dalam format JSON
-function fetchData(sheetURL) {
-  fetch(sheetURL)
-    .then(response => response.json())
+function fetchData(url) {
+  fetch(url)
+    .then(res => res.json())
     .then(data => populateTable(data))
-    .catch(error => console.error("Gagal mengambil data:", error));
+    .catch(err => console.error("Gagal fetch data:", err));
 }
 
-// Fungsi untuk mengisi tabel dengan data yang diambil dan menyimpan versi asli-nya
 function populateTable(data) {
-  const tableBody = document.getElementById("tableBody");
-  tableBody.innerHTML = ""; // Kosongkan isi sebelumnya
-  originalTableData = []; // Reset isi asli
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  originalTableData = [];
 
   data.forEach(row => {
-    const newRow = document.createElement("tr");
-    newRow.innerHTML = `
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
       <td>${row["timestamp"] || "-"}</td>
       <td>${row["ID Book"] || "-"}</td>
       <td>${row["Book Title"] || "-"}</td>
-      <td>${row["Writter"] || "-"}</td>
+      <td>${row["Writer"] || "-"}</td>
       <td>${row["Year of Publish"] || "-"}</td>
       <td>${row["Quantity"] || "-"}</td>
       <td>${row["Status"] || "-"}</td>
     `;
-    tableBody.appendChild(newRow);
-
-    // Simpan isi asli dari setiap sel untuk kebutuhan highlight pencarian
-    const cellContents = Array.from(newRow.cells).map(cell => cell.innerHTML);
-    originalTableData.push(cellContents);
+    tbody.appendChild(tr);
+    originalTableData.push(Array.from(tr.cells).map(cell => cell.innerHTML));
   });
 }
 
-// Fungsi untuk mencari teks dalam tabel dan memberi highlight
-function searchTable() {
-  const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
-  const tableBody = document.getElementById("tableBody");
-  const rows = Array.from(tableBody.querySelectorAll("tr"));
+function initFormSubmit() {
+  const form = document.forms['submit-to-google-sheet'];
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    fetch(formSubmitURL, { method: 'POST', body: new FormData(form) })
+      .then(() => {
+        alert("Data berhasil ditambahkan!");
+        form.reset();
+        fetchData(dataDisplayURL);
+      })
+      .catch(error => {
+        alert("Gagal mengirim data.");
+        console.error(error);
+      });
+  });
+}
 
-  let found = false;
+function initSearch() {
+  const input = document.getElementById("searchInput");
+  const button = document.getElementById("searchButton");
 
-  // Loop melalui setiap baris tabel
-  rows.forEach((row, rowIndex) => {
-    let match = false;
+  function search() {
+    const keyword = input.value.toLowerCase();
+    const rows = document.querySelectorAll("#tableBody tr");
+    let found = false;
 
-    // Loop melalui setiap sel dalam baris
-    Array.from(row.cells).forEach((cell, cellIndex) => {
-      // Ambil isi asli cell (tanpa highlight)
-      const originalText = originalTableData[rowIndex][cellIndex];
-      const lowerText = originalText.toLowerCase();
-
-      if (lowerText.includes(searchValue)) {
-        match = true;
-        // Ganti bagian teks yang cocok dengan elemen highlight
-        cell.innerHTML = originalText.replace(
-          new RegExp(`(${searchValue})`, "gi"),
-          `<span class="highlight">$1</span>`
-        );
-      } else {
-        // Jika tidak cocok, kembalikan ke isi asli (tanpa highlight)
-        cell.innerHTML = originalText;
+    rows.forEach((row, rowIndex) => {
+      let match = false;
+      Array.from(row.cells).forEach((cell, cellIndex) => {
+        const original = originalTableData[rowIndex][cellIndex];
+        const text = original.toLowerCase();
+        if (text.includes(keyword)) {
+          match = true;
+          cell.innerHTML = original.replace(
+            new RegExp(`(${keyword})`, "gi"),
+            `<span class="highlight">$1</span>`
+          );
+        } else {
+          cell.innerHTML = original;
+        }
+      });
+      if (match && !found) {
+        row.scrollIntoView({ behavior: "smooth", block: "center" });
+        found = true;
       }
     });
 
-    // Jika baris cocok dan belum ada hasil sebelumnya, scroll ke sana
-    if (match && !found) {
-      row.scrollIntoView({ behavior: "smooth", block: "center" });
-      found = true;
-    }
-  });
-
-  // Jika tidak ditemukan sama sekali, tampilkan alert
-  if (!found) {
-    alert(`Kata "${searchValue}" tidak ditemukan dalam daftar.`);
+    if (!found) alert(`Tidak ditemukan: "${keyword}"`);
   }
+
+  button.addEventListener("click", search);
+  input.addEventListener("keypress", e => {
+    if (e.key === "Enter") search();
+  });
 }
 
-// Tombol pencarian (klik)
-document.getElementById("searchButton").addEventListener("click", searchTable);
-
-// Tombol pencarian (tekan Enter)
-document.getElementById("searchInput").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    searchTable();
-  }
-});
-
-// Tombol back to top
-document.getElementById("backToTop").addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+function initBackToTop() {
+  document.getElementById("backToTop").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}

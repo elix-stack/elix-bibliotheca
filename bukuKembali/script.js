@@ -1,17 +1,40 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzoa8F7RBRTW1NZVBmHBh2hVHr_1HtYYUB570en2MTJ5JFJGJv98-y53eTVhCX0df-Dfg/exec'
-  const form = document.forms['submit-to-google-sheet']
+const scriptURL = 'https://script.google.com/macros/s/AKfycbzPgSJxVeOd979Nmj-gJeUpGOLwG7xSUathDOy7TkN8RoL7dvfzwZnR3bm3YHp6zU83wA/exec';
+const form = document.forms['submit-to-google-sheet'];
 
-  form.addEventListener('submit', e => {
-    e.preventDefault()
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-      .then(response => {console.log('Success!', response);
-        form.reset()})
-      .catch(error => console.error('Error!', error.message))
-  })
+// Event listener untuk submit form
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const messageDiv = document.getElementById('message');
+  messageDiv.innerHTML = ''; // Reset pesan sebelumnya
 
-  // Saat dokumen siap dimuat, ambil data dari Google Sheets
+  // Ambil data form
+  const formData = new FormData(form);
+
+  // Cek apakah ID Book dan Book Title sesuai
+  const idBook = formData.get('ID Book');
+  const bookTitle = formData.get('Book Title');
+
+  // Validasi bahwa ID Book dan Book Title ada
+  if (!idBook || !bookTitle) {
+    messageDiv.innerHTML = 'ID Book dan Book Title harus diisi!';
+    return;
+  }
+
+  // Kirim data ke Google Apps Script
+  fetch(scriptURL, { method: 'POST', body: formData })
+    .then(response => {
+      messageDiv.innerHTML = 'Data berhasil disubmit!';
+      form.reset(); // Reset form
+    })
+    .catch(error => {
+      messageDiv.innerHTML = 'Terjadi kesalahan saat mengirim data.';
+      console.error('Error!', error.message);
+    });
+});
+
+// Saat dokumen siap dimuat, ambil data dari Google Sheets
 document.addEventListener("DOMContentLoaded", function () {
-  const sheetURL = "https://script.google.com/macros/s/AKfycbwIKXpEPelVenftPi8pxTeDBwNU7RyPBS15r9jkchJipX9zZnP0OvA2fclpTHT_SZ0A8A/exec";
+  const sheetURL = "https://script.google.com/macros/s/AKfycbx6D0cwKDVv4JXjaKvw9hKDfKLFEZ35MDXfeX5GbxBEQSR8XXPo1khrUHM7iQUIJSPkKg/exec";
   fetchData(sheetURL);
 });
 

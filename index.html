@@ -1,43 +1,56 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="styleAdmin.css">
-  <title>Elix Library Data Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styleAdmin.css" />
+  <title>Elix Library - Admin Panel</title>
 </head>
 <body>
   <h1>Elix Library Data Admin</h1>
-  <button><a href="./inputNewBook/index.html" target="_blank">Input New Book</a></button>
-  <button><a href="./userInterface/index.html" target="_blank">UI</a></button>
-  <button><a href="./pinjamBuku/index.htm" target="_blank">Pinjam Buku</a></button>
-  <button><a href="./bukuKembali/index.html" target="_blank">Buku Kembali</a></button>
-  <button><a href="" target="_blank">Buku Rusak</a></button>
-  <button><a href="" target="_blank">Buku Hilang</a></button>
-  <input id="searchInput" type="text" placeholder="Search by title" required>
-  <button id="searchButton" onclick="console.log('searching');">Search</button>
 
-<table border="1px solid black">
-  <thead>
-    <tr>
-    <th>Timestamp</th>
-    <th>ID Book</th>
-    <th>Title</th>
-    <th>Writter</th>
-    <th>Year of Published</th>
-    <th>Quantity</th>
-    <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody">
-    <tr>
-      <td>
-        <!-- automate from js function -->
-      </td>
-    </tr>
-  </tbody>
-</table>
-<button id="backToTop">Back to Top</button>
-<script src="script.js"></script>
+  <!-- Navigasi -->
+  <div class="button-container">
+    <button><a href="./inputNewBook/index.html" target="_blank">Input New Book</a></button>
+    <button><a href="./userInterface/index.html" target="_blank">UI</a></button>
+    <button><a href="./pinjamBuku/index.html" target="_blank">Pinjam Buku</a></button>
+    <button><a href="./bukuKembali/index.html" target="_blank">Buku Kembali</a></button>
+    <button><a href="./bukuRusak/index.html" target="_blank">Buku Rusak</a></button>
+    <button><a href="./bukuHilang/index.html" target="_blank">Buku Hilang</a></button>
+  </div>
+
+  <!-- Form Tambah Buku -->
+  <h2>Tambah Buku</h2>
+  <form id="formTambahBuku" name="submit-to-google-sheet">
+    <input type="text" name="ID Book" placeholder="ID Book" required />
+    <input type="text" name="Book Title" placeholder="Book Title" required />
+    <input type="text" name="Writer" placeholder="Writer" required />
+    <input type="text" name="Year of Publish" placeholder="Year of Publish" required />
+    <input type="number" name="Quantity" placeholder="Quantity" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <!-- Search & Table -->
+  <input id="searchInput" type="text" placeholder="Search by title" />
+  <button id="searchButton">Search</button>
+
+  <table border="1px solid black">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>ID Book</th>
+        <th>Book Title</th>
+        <th>Writer</th>
+        <th>Year of Publish</th>
+        <th>Quantity</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <button id="backToTop">Back to Top</button>
+
+  <script src="script.js"></script>
 </body>
 </html>

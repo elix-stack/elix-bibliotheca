@@ -21,7 +21,7 @@ data.forEach(row => {
 const newRow = document.createElement("tr");
 newRow.innerHTML = `
   <td>${row["Book Title"] || "-"}</td>
-  <td>${row["Writter"] || "-"}</td>
+  <td>${row["Writer"] || "-"}</td>
   <td>${row["Year of Publish"] || "-"}</td>
   <td>${row["SUM of Quantity"] || "-"}</td>
 `;

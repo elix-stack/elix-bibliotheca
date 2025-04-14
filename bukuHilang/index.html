@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buku Hilang</title>
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <h1>Buku Hilang</h1>
+
+  <form name="submit-to-google-sheet">
+    <input type="text" name="ID Book" placeholder="ID Book" required>
+    <input type="text" name="Book Title" placeholder="Book Title" required>
+    <input type="text" name="Writer" placeholder="Writer" required>
+    <input type="text" name="Year of Publish" placeholder="Year of Publish" required>
+    <input type="number" name="Quantity" placeholder="Quantity" required>
+    <input type="text" name="Status" placeholder="Status" required><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <table border="1px solid black">
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>ID Book</th>
+        <th>Title</th>
+        <th>Writer</th>
+        <th>Year of Published</th>
+        <th>Quantity</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script src="script.js"></script>
+</body>
+</html>

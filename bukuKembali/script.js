@@ -1,30 +1,27 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzPgSJxVeOd979Nmj-gJeUpGOLwG7xSUathDOy7TkN8RoL7dvfzwZnR3bm3YHp6zU83wA/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbzoa8F7RBRTW1NZVBmHBh2hVHr_1HtYYUB570en2MTJ5JFJGJv98-y53eTVhCX0df-Dfg/exec';
 const form = document.forms['submit-to-google-sheet'];
+const messageDiv = document.getElementById('message');
+let originalTableData = [];
 
-// Event listener untuk submit form
+// Submit form
 form.addEventListener('submit', e => {
   e.preventDefault();
-  const messageDiv = document.getElementById('message');
-  messageDiv.innerHTML = ''; // Reset pesan sebelumnya
+  messageDiv.innerHTML = '';
 
-  // Ambil data form
   const formData = new FormData(form);
-
-  // Cek apakah ID Book dan Book Title sesuai
   const idBook = formData.get('ID Book');
   const bookTitle = formData.get('Book Title');
 
-  // Validasi bahwa ID Book dan Book Title ada
   if (!idBook || !bookTitle) {
     messageDiv.innerHTML = 'ID Book dan Book Title harus diisi!';
     return;
   }
 
-  // Kirim data ke Google Apps Script
   fetch(scriptURL, { method: 'POST', body: formData })
     .then(response => {
       messageDiv.innerHTML = 'Data berhasil disubmit!';
-      form.reset(); // Reset form
+      form.reset();
+      fetchData(); // Auto-refresh data setelah submit
     })
     .catch(error => {
       messageDiv.innerHTML = 'Terjadi kesalahan saat mengirim data.';
@@ -32,96 +29,99 @@ form.addEventListener('submit', e => {
     });
 });
 
-// Saat dokumen siap dimuat, ambil data dari Google Sheets
+// Ambil data saat halaman dimuat
 document.addEventListener("DOMContentLoaded", function () {
-  const sheetURL = "https://script.google.com/macros/s/AKfycbx6D0cwKDVv4JXjaKvw9hKDfKLFEZ35MDXfeX5GbxBEQSR8XXPo1khrUHM7iQUIJSPkKg/exec";
-  fetchData(sheetURL);
+  fetchData();
 });
 
-// Fungsi untuk mengambil data dari Google Sheets dalam format JSON
-function fetchData(sheetURL) {
+// Ambil data dari Google Sheets
+function fetchData() {
+  const sheetURL = "https://script.google.com/macros/s/AKfycbxEfbg9OHiy_wxJwlBAToePcxQTQAcls2eWSofYjqjwYMov0DfeDXVzysiQ0ki4X48_bw/exec";
   fetch(sheetURL)
     .then(response => response.json())
-    .then(data => populateTable(data))
+    .then(response => {
+      const data = response.data || response;
+      if (Array.isArray(data)) {
+        populateTable(data);
+      } else {
+        console.error("Format response tidak sesuai:", response);
+      }
+    })
     .catch(error => console.error("Gagal mengambil data:", error));
 }
 
-// Fungsi untuk mengisi tabel dengan data yang diambil dan menyimpan versi asli-nya
+// Tampilkan data di tabel
 function populateTable(data) {
   const tableBody = document.getElementById("tableBody");
-  tableBody.innerHTML = ""; // Kosongkan isi sebelumnya
-  originalTableData = []; // Reset isi asli
+  tableBody.innerHTML = "";
+  originalTableData = [];
 
   data.forEach(row => {
     const newRow = document.createElement("tr");
     newRow.innerHTML = `
-      <td>${row["timestamp"] || "-"}</td>
+      <td>${row.Timestamp || "-"}</td>
       <td>${row["ID Member"] || "-"}</td>
       <td>${row["Nama Peminjam"] || "-"}</td>
       <td>${row["Email Peminjam"] || "-"}</td>
       <td>${row["Telp Peminjam"] || "-"}</td>
       <td>${row["ID Book"] || "-"}</td>
       <td>${row["Book Title"] || "-"}</td>
-      <td>${row["Quantity"] || "-"}</td>
+      <td>${row.Quantity || "-"}</td>
     `;
     tableBody.appendChild(newRow);
 
-    // Simpan isi asli dari setiap sel untuk kebutuhan highlight pencarian
     const cellContents = Array.from(newRow.cells).map(cell => cell.innerHTML);
     originalTableData.push(cellContents);
   });
 }
 
-// Fungsi untuk mencari teks dalam tabel dan memberi highlight
+// Fungsi pencarian + highlight
 function searchTable() {
   const searchValue = document.getElementById("searchInput").value.toLowerCase().trim();
   const tableBody = document.getElementById("tableBody");
   const rows = Array.from(tableBody.querySelectorAll("tr"));
 
+  if (!originalTableData.length) {
+    alert("Data belum dimuat. Coba refresh halaman.");
+    return;
+  }
+
   let found = false;
 
-  // Loop melalui setiap baris tabel
   rows.forEach((row, rowIndex) => {
     let match = false;
 
-    // Loop melalui setiap sel dalam baris
     Array.from(row.cells).forEach((cell, cellIndex) => {
-      // Ambil isi asli cell (tanpa highlight)
       const originalText = originalTableData[rowIndex][cellIndex];
       const lowerText = originalText.toLowerCase();
 
       if (lowerText.includes(searchValue)) {
         match = true;
-        // Ganti bagian teks yang cocok dengan elemen highlight
         cell.innerHTML = originalText.replace(
           new RegExp(`(${searchValue})`, "gi"),
           `<span class="highlight">$1</span>`
         );
       } else {
-        // Jika tidak cocok, kembalikan ke isi asli (tanpa highlight)
         cell.innerHTML = originalText;
       }
     });
 
-    // Jika baris cocok dan belum ada hasil sebelumnya, scroll ke sana
     if (match && !found) {
       row.scrollIntoView({ behavior: "smooth", block: "center" });
       found = true;
     }
   });
 
-  // Jika tidak ditemukan sama sekali, tampilkan alert
   if (!found) {
     alert(`Kata "${searchValue}" tidak ditemukan dalam daftar.`);
   }
 }
 
-// Tombol pencarian (klik)
+// Event pencarian
 document.getElementById("searchButton").addEventListener("click", searchTable);
-
-// Tombol pencarian (tekan Enter)
 document.getElementById("searchInput").addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
+    e.preventDefault();
     searchTable();
   }
 });

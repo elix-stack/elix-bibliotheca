@@ -1,7 +1,5 @@
-// script.js untuk Buku Hilang
-
-const submitURL = 'https://script.google.com/macros/s/AKfycbynfcO5xFbL4BBIdV-JaMZ3z-a-UQiQF-SJD3-8CBvvtHKbqxvLz8r01jl4bPnjF6abhQ/exec'; // Ganti dengan URL Web App untuk submit
-const displayURL = 'https://script.google.com/macros/s/AKfycbyFVKd3wwmsgCCSK0yNaMGjjNzmi0Ky1Ju4diuINFqEFId4KJYRjFYQpLJZZNvahVhQtw/exec'; // Ganti dengan URL Web App untuk display
+const submitURL = 'https://script.google.com/macros/s/AKfycbynfcO5xFbL4BBIdV-JaMZ3z-a-UQiQF-SJD3-8CBvvtHKbqxvLz8r01jl4bPnjF6abhQ/exec'; // URL Web App untuk submit
+const displayURL = 'https://script.google.com/macros/s/AKfycbyFVKd3wwmsgCCSK0yNaMGjjNzmi0Ky1Ju4diuINFqEFId4KJYRjFYQpLJZZNvahVhQtw/exec'; // URL Web App untuk display
 
 const form = document.forms['submit-to-google-sheet'];
 
@@ -9,11 +7,27 @@ const form = document.forms['submit-to-google-sheet'];
 form.addEventListener('submit', e => {
   e.preventDefault();
 
+  // Ambil data form
+  const formData = new FormData(form);
+  const data = {};
+
+  // Menyusun data menjadi object JSON
+  formData.forEach((value, key) => {
+    data[key] = value;
+  });
+
+  // Kirim data sebagai JSON ke backend
   fetch(submitURL, {
     method: 'POST',
-    body: new FormData(form)
+    headers: {
+      'Content-Type': 'application/json', // Menyatakan bahwa data yang dikirim dalam format JSON
+    },
+    body: JSON.stringify(data), // Kirim data sebagai JSON string
   })
     .then(response => {
+      return response.json();
+    })
+    .then(responseData => {
       alert("Data buku hilang berhasil disubmit.");
       form.reset();
       loadLostBooks(); // Refresh tampilan data

@@ -1,21 +1,15 @@
+// Tetap menggunakan scriptURL di sini
 const scriptURL = 'https://script.google.com/macros/s/AKfycbzoa8F7RBRTW1NZVBmHBh2hVHr_1HtYYUB570en2MTJ5JFJGJv98-y53eTVhCX0df-Dfg/exec';
 const form = document.forms['submit-to-google-sheet'];
 const messageDiv = document.getElementById('message');
 let originalTableData = [];
 
-// Submit form
+// Submit form tanpa validasi manual
 form.addEventListener('submit', e => {
   e.preventDefault();
   messageDiv.innerHTML = '';
 
   const formData = new FormData(form);
-  const idBook = formData.get('ID Book');
-  const bookTitle = formData.get('Book Title');
-
-  if (!idBook || !bookTitle) {
-    messageDiv.innerHTML = 'ID Book dan Book Title harus diisi!';
-    return;
-  }
 
   fetch(scriptURL, { method: 'POST', body: formData })
     .then(response => {

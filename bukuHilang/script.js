@@ -1,3 +1,4 @@
+// URL Web App untuk submit dan display data
 const submitURL = 'https://script.google.com/macros/s/AKfycbynfcO5xFbL4BBIdV-JaMZ3z-a-UQiQF-SJD3-8CBvvtHKbqxvLz8r01jl4bPnjF6abhQ/exec'; // URL Web App untuk submit
 const displayURL = 'https://script.google.com/macros/s/AKfycbyFVKd3wwmsgCCSK0yNaMGjjNzmi0Ky1Ju4diuINFqEFId4KJYRjFYQpLJZZNvahVhQtw/exec'; // URL Web App untuk display
 

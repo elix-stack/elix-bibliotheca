@@ -50,6 +50,7 @@
                 form.reset();
                 fetchData(loanDataURL);  // Panggil ulang fetchData setelah data berhasil ditambahkan
                 alert("Data berhasil ditambahkan!");
+                messageDiv.innerHTML = 'Data berhasil disubmit!';
               })
               .catch(error => {
                 console.error(error);

@@ -1,0 +1,188 @@
+/* Umum */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* Heading */
+h1,
+h2 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* Navigasi */
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.button-container button {
+  background-color: #3498db;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.button-container button a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.button-container button:hover {
+  background-color: #2980b9;
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+form input,
+form button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+form input {
+  flex: 1 1 200px;
+}
+
+form button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background-color: #27ae60;
+}
+
+/* Dropdown dan Input Pencarian */
+select,
+#searchInput,
+#searchButton {
+  padding: 10px;
+  margin: 5px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+#searchButton {
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#searchButton:hover {
+  background-color: #e67e22;
+}
+
+/* Tabel */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  margin-top: 20px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+  background-color: #34495e;
+  color: white;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+/* Highlight hasil pencarian */
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+/* Tombol Back to Top */
+#backToTop {
+  display: block;
+  margin: 30px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #9b59b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#backToTop:hover {
+  background-color: #8e44ad;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  form {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  form input {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  select,
+  #searchInput,
+  #searchButton {
+    width: 90%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  th,
+  td {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  form input,
+  form button {
+    font-size: 14px;
+  }
+
+  #searchInput,
+  #searchButton,
+  select {
+    font-size: 14px;
+  }
+}

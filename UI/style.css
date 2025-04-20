@@ -1,0 +1,227 @@
+/* -------------------- */
+/* Gaya Dasar (Light Mode) */
+/* -------------------- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+p {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.search {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+input[type='text'] {
+  padding: 10px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+thead {
+  background-color: #4caf50;
+  color: white;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+/* Tombol Back to Top dan Dark Mode Toggle */
+#backToTop,
+#darkModeToggle {
+  position: fixed;
+  right: 20px;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+#backToTop {
+  bottom: 20px;
+}
+
+#darkModeToggle {
+  top: 20px;
+}
+
+/* -------------------- */
+/* Mode Gelap (Dark Mode) */
+/* -------------------- */
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body.dark-mode table {
+  border-color: #555;
+}
+
+body.dark-mode thead {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark-mode tr:nth-child(even) {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode th,
+body.dark-mode td {
+  border-color: #444;
+}
+
+body.dark-mode .highlight {
+  background-color: #ffcc00;
+  color: #000;
+}
+
+body.dark-mode input[type='text'] {
+  background-color: #1f1f1f;
+  color: #f0f0f0;
+  border: 1px solid #555;
+}
+
+body.dark-mode button {
+  background-color: #2196f3;
+}
+
+body.dark-mode button:hover {
+  background-color: #1976d2;
+}
+
+/* -------------------- */
+/* Media Queries */
+/* -------------------- */
+
+@media (max-width: 1600px) {
+  input[type='text'] {
+    width: 280px;
+  }
+}
+
+@media (max-width: 1200px) {
+  input[type='text'] {
+    width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  input[type='text'] {
+    width: 85%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  button {
+    width: 15%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  #darkModeToggle,
+  #backToTop {
+    right: 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  input[type='text'] {
+    width: 95%;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  button {
+    width: 20%;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    font-size: 11px;
+    padding: 6px;
+  }
+
+  #darkModeToggle,
+  #backToTop {
+    right: 8px;
+    padding: 5px 7px;
+    font-size: 11px;
+  }
+
+  .search {
+    gap: 6px;
+    margin-bottom: 15px;
+  }
+}

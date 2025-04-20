@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Rusak</title>
+  </head>
+  <body>
+    <h1>Data Buku Rusak</h1>
+
+    <!-- Navigasi -->
+    <div class="button-container">
+      <button><a href="../UI/index.html" target="_blank">UI</a></button>
+      <button><a href="../index.html">Home</a></button>
+      <button><a href="../peminjaman/index.html">Pinjam Buku</a></button>
+      <button><a href="../pengembalian/index.html">Buku Kembali</a></button>
+      <button><a href="../hilang/index.html">Buku Hilang</a></button>
+      <button><a href="../member/index.html">Daftar Member</a></button>
+      <button><a href="../pengunjung/index.html" target="_blank">Data Pengunjung</a></button>
+    </div>
+
+    <!-- Form Tambah Buku Rusak -->
+    <h2>Form Buku Rusak</h2>
+    <form name="submit-to-google-sheet">
+      <input type="text" name="id book" placeholder="ID Book" required />
+      <input type="text" name="book title" placeholder="Book Title" required />
+      <input type="text" name="writer" placeholder="Writer" required />
+      <input type="text" name="year of publish" placeholder="Year of Publish" required />
+      <input type="text" name="publisher" placeholder="Publisher" required />
+      <input type="number" name="quantity" placeholder="Quantity" required />
+      <textarea name="keterangan" placeholder="Keterangan" rows="4" cols="30" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Filter Kolom -->
+    <select id="searchColumn">
+      <option value="all">Semua Kolom</option>
+      <option value="0">Timestamp</option>
+      <option value="1">ID Book</option>
+      <option value="2">Book Title</option>
+      <option value="3">Writer</option>
+      <option value="4">Year of Publish</option>
+      <option value="5">Publisher</option>
+      <option value="6">Quantity</option>
+    </select>
+
+    <!-- Input Pencarian -->
+    <input id="searchInput" type="text" placeholder="Search by title" required />
+    <button id="searchButton" onclick="console.log('searching');">Search</button>
+
+    <!-- Tabel Data -->
+    <table>
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>ID Book</th>
+          <th>Book Title</th>
+          <th>Writer</th>
+          <th>Year of Publish</th>
+          <th>Publisher</th>
+          <th>Quantity</th>
+          <th>Condition</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <!-- Tombol Kembali ke Atas -->
+    <button id="backToTop">Back to Top</button>
+
+    <script>
+      // inputan data
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbwybTMje7Wo16lYw7nlFQUjo6nZ0H_EMT4DCA0FvuLtkBQ7cDLgpKvjux_s27RqKDfduQ/exec';
+      const form = document.forms['submit-to-google-sheet'];
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+          .then((response) => {
+            console.log('Success!', response);
+            alert('Success!', response);
+            form.reset();
+            window.location.reload();
+          })
+          .catch((error) => console.error('Error!', error.message));
+      });
+
+      // pemanggilan data
+      // Saat dokumen siap, ambil data dari Google Sheet
+      document.addEventListener('DOMContentLoaded', function () {
+        const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjmvFsEFu_1PAnOrGxthCKBKdFZM__OdTGdQ1fvAbGcNDaAbNPSA1fmfQhcoCsb4Qcrrvt4tvNulpv/pub?gid=1365684086&single=true&output=csv';
+        fetchData(sheetURL);
+        initBackToTop();
+      });
+
+      // Mengambil data CSV dari Google Sheets
+      function fetchData(sheetURL) {
+        fetch(sheetURL)
+          .then((response) => response.text())
+          .then((data) => populateTable(data))
+          .catch((error) => console.error('Gagal mengambil data:', error));
+      }
+
+      // Mengisi tabel dengan data yang diambil
+      function populateTable(data) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+
+        const rows = data.split('\n').slice(1); // Lewati header
+        rows.forEach((row) => {
+          const columns = row.split(',');
+          const newRow = document.createElement('tr');
+
+          columns.forEach((column) => {
+            const cell = document.createElement('td');
+            cell.textContent = column.trim();
+            newRow.appendChild(cell);
+          });
+
+          tableBody.appendChild(newRow);
+        });
+        // Inisialisasi fitur-fitur yang butuh data tabel
+        initOriginalTableData();
+        initSearch();
+        initRealTimeSearch();
+      }
+
+      // Simpan data original untuk reset dan highlight
+      let originalTableData = [];
+
+      function initOriginalTableData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        originalTableData = Array.from(rows).map((row) => Array.from(row.cells).map((cell) => cell.innerText));
+      }
+
+      function initSearch() {
+        const input = document.getElementById('searchInput');
+        const button = document.getElementById('searchButton');
+        const select = document.getElementById('searchColumn');
+
+        function search() {
+          const keyword = input.value.toLowerCase().trim();
+          const selectedColumn = select.value;
+          const rows = document.querySelectorAll('#tableBody tr');
+          let found = false;
+
+          rows.forEach((row, rowIndex) => {
+            // Selalu tampilkan semua baris
+            row.style.display = '';
+
+            // Hapus highlight lama dan reset konten sel ke versi asli
+            Array.from(row.cells).forEach((cell, cellIndex) => {
+              const original = originalTableData[rowIndex][cellIndex];
+              cell.innerHTML = original;
+              row.classList.remove('highlight');
+            });
+
+            if (keyword === '') return; // Tidak usah cari jika kosong
+
+            let match = false;
+
+            if (selectedColumn === 'all') {
+              Array.from(row.cells).forEach((cell, cellIndex) => {
+                const original = originalTableData[rowIndex][cellIndex];
+                const text = original.toLowerCase();
+                if (text.includes(keyword)) {
+                  match = true;
+                  // Highlight kata yang dicari
+                  cell.innerHTML = original.replace(new RegExp(`(${keyword})`, 'gi'), `<span class="highlight">$1</span>`);
+                }
+              });
+            } else {
+              const index = parseInt(selectedColumn);
+              const original = originalTableData[rowIndex][index];
+              const text = original.toLowerCase();
+              if (text.includes(keyword)) {
+                match = true;
+                row.cells[index].innerHTML = original.replace(new RegExp(`(${keyword})`, 'gi'), `<span class="highlight">$1</span>`);
+              }
+            }
+
+            // Jika cocok, beri highlight dan scroll
+            if (match && !found) {
+              row.classList.add('highlight');
+              row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              found = true;
+            }
+          });
+
+          // Jika tidak ditemukan sama sekali
+          if (!found && keyword !== '') {
+            alert(`Tidak ditemukan: "${keyword}"`);
+          }
+
+          // Reset input setelah pencarian
+          input.value = '';
+        }
+
+        // Event: klik tombol cari
+        button.addEventListener('click', search);
+
+        // Event: tekan Enter saat mengetik
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') search();
+        });
+      }
+
+      // Tombol scroll ke atas
+      function initBackToTop() {
+        document.getElementById('backToTop').addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    </script>
+  </body>
+</html>

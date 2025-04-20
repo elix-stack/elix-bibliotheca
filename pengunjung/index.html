@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Data Pengunjung</title>
+  </head>
+  <body>
+    <h1>Data Pengunjung</h1>
+
+    <!-- Navigasi -->
+    <div class="button-container">
+      <button><a href="../index.html">Home</a></button>
+      <button><a href="../UI/index.html" target="_blank">UI</a></button>
+      <button><a href="../peminjaman/index.html">Pinjam Buku</a></button>
+      <button><a href="../pengembalian/index.html">Buku Kembali</a></button>
+      <button><a href="../rusak/index.html">Buku Rusak</a></button>
+      <button><a href="../hilang/index.html">Buku Hilang</a></button>
+      <button><a href="../member/index.html">Daftar Member</a></button>
+    </div>
+
+    <!-- Form Buku Kunjungan -->
+    <form name="submit-to-google-sheet">
+      <input type="text" name="id member" placeholder="ID Member / Not Available" />
+      <input type="text" name="nama" placeholder="Nama" required />
+      <input type="text" name="keperluan" placeholder="Keperluan" required />
+      <textarea name="keterangan" placeholder="Keterangan" rows="4" cols="30" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Filter berdasarkan kolom tertentu -->
+    <select id="searchColumn">
+      <option value="all">Semua Kolom</option>
+      <option value="0">Timestamp</option>
+      <option value="1">ID Member</option>
+      <option value="2">Nama</option>
+      <option value="3">Keperluan</option>
+      <option value="4">Keterangan</option>
+    </select>
+
+    <!-- Input pencarian -->
+    <input id="searchInput" type="text" placeholder="Search by title" required />
+    <button id="searchButton" onclick="console.log('searching');">Search</button>
+
+    <table border="1px solid black">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>ID Member</th>
+          <th>Nama</th>
+          <th>Keperluan</th>
+          <th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <!-- Tombol back to top -->
+    <button id="backToTop">Back to Top</button>
+
+    <script>
+      // inputan data
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzIeHJ4BeHE9Rnm5jidbytrFN-5a16-TXrKpTlpu_7bjTM9GGgOYXMtI1TOZo5asUIm0w/exec';
+      const form = document.forms['submit-to-google-sheet'];
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+          .then((response) => {
+            console.log('Success!', response);
+            alert('Success!', response);
+            form.reset();
+            window.location.reload();
+          })
+          .catch((error) => console.error('Error!', error.message));
+      });
+
+      // pemanggilan data
+      // Saat dokumen siap, ambil data dari Google Sheet
+      document.addEventListener('DOMContentLoaded', function () {
+        const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTjmvFsEFu_1PAnOrGxthCKBKdFZM__OdTGdQ1fvAbGcNDaAbNPSA1fmfQhcoCsb4Qcrrvt4tvNulpv/pub?gid=1445305054&single=true&output=csv';
+        fetchData(sheetURL);
+        initBackToTop();
+      });
+
+      // Mengambil data CSV dari Google Sheets
+      function fetchData(sheetURL) {
+        fetch(sheetURL)
+          .then((response) => response.text())
+          .then((data) => populateTable(data))
+          .catch((error) => console.error('Gagal mengambil data:', error));
+      }
+
+      // Mengisi tabel dengan data yang diambil
+      function populateTable(data) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+
+        const rows = data.split('\n').slice(1); // Lewati header
+        rows.forEach((row) => {
+          const columns = row.split(',');
+          const newRow = document.createElement('tr');
+
+          columns.forEach((column) => {
+            const cell = document.createElement('td');
+            cell.textContent = column.trim();
+            newRow.appendChild(cell);
+          });
+
+          tableBody.appendChild(newRow);
+        });
+        // Inisialisasi fitur-fitur yang butuh data tabel
+        initOriginalTableData();
+        initSearch();
+        initRealTimeSearch();
+      }
+
+      // Simpan data original untuk reset dan highlight
+      let originalTableData = [];
+
+      function initOriginalTableData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        originalTableData = Array.from(rows).map((row) => Array.from(row.cells).map((cell) => cell.innerText));
+      }
+
+      function initSearch() {
+        const input = document.getElementById('searchInput');
+        const button = document.getElementById('searchButton');
+        const select = document.getElementById('searchColumn');
+
+        function search() {
+          const keyword = input.value.toLowerCase().trim();
+          const selectedColumn = select.value;
+          const rows = document.querySelectorAll('#tableBody tr');
+          let found = false;
+
+          rows.forEach((row, rowIndex) => {
+            // Selalu tampilkan semua baris
+            row.style.display = '';
+
+            // Hapus highlight lama dan reset konten sel ke versi asli
+            Array.from(row.cells).forEach((cell, cellIndex) => {
+              const original = originalTableData[rowIndex][cellIndex];
+              cell.innerHTML = original;
+              row.classList.remove('highlight');
+            });
+
+            if (keyword === '') return; // Tidak usah cari jika kosong
+
+            let match = false;
+
+            if (selectedColumn === 'all') {
+              Array.from(row.cells).forEach((cell, cellIndex) => {
+                const original = originalTableData[rowIndex][cellIndex];
+                const text = original.toLowerCase();
+                if (text.includes(keyword)) {
+                  match = true;
+                  // Highlight kata yang dicari
+                  cell.innerHTML = original.replace(new RegExp(`(${keyword})`, 'gi'), `<span class="highlight">$1</span>`);
+                }
+              });
+            } else {
+              const index = parseInt(selectedColumn);
+              const original = originalTableData[rowIndex][index];
+              const text = original.toLowerCase();
+              if (text.includes(keyword)) {
+                match = true;
+                row.cells[index].innerHTML = original.replace(new RegExp(`(${keyword})`, 'gi'), `<span class="highlight">$1</span>`);
+              }
+            }
+
+            // Jika cocok, beri highlight dan scroll
+            if (match && !found) {
+              row.classList.add('highlight');
+              row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              found = true;
+            }
+          });
+
+          // Jika tidak ditemukan sama sekali
+          if (!found && keyword !== '') {
+            alert(`Tidak ditemukan: "${keyword}"`);
+          }
+
+          // Reset input setelah pencarian
+          input.value = '';
+        }
+
+        // Event: klik tombol cari
+        button.addEventListener('click', search);
+
+        // Event: tekan Enter saat mengetik
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') search();
+        });
+      }
+
+      // Tombol scroll ke atas
+      function initBackToTop() {
+        document.getElementById('backToTop').addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    </script>
+  </body>
+</html>

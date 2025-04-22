@@ -28,4 +28,4 @@ This project was created to promote professionalism in library administration an
 
 ## 📬 Contact
 
-For any inquiries or feedback, please contact me via this [form](https://elix-stack.github.io/elix-showcase/projects/contactForm/contactForm.html).
+For any inquiries or feedback, please contact me via this [contact form](https://elix-stack.github.io/elix-showcase/projects/contactForm/contactForm.html).

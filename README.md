@@ -29,3 +29,10 @@ This project was created to promote professionalism in library administration an
 ## 📬 Contact
 
 For any inquiries or feedback, please contact me via this [contact form](https://elix-stack.github.io/elix-showcase/projects/contactForm/contactForm.html).
+
+
+## 🔒 License
+
+This project is a proprietary software and is not licensed for free use, redistribution, or modification. All rights are reserved by the original author. For full terms, please refer to the [LICENSE](LICENSE) file in this repository.
+
+To use or obtain a customised version of this project, please contact the developer for a paid service request via the [Contact Form](https://elix-stack.github.io/elix-showcase/projects/contactForm/contactForm.html).
